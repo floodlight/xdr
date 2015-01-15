@@ -1,8 +1,15 @@
 #!/usr/bin/env python
-import xdr
+import xdr.parser
+from pprint import pprint
+import argparse
 
 def main():
-    pass
+    parser = argparse.ArgumentParser(description='XDR compiler')
+    parser.add_argument("input", metavar="FILE", type=file, help="Input file")
+
+    args = parser.parse_args()
+
+    pprint(xdr.parser.parse(args.input.read()))
 
 if __name__ == "__main__" :
     main()
