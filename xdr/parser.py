@@ -9,6 +9,7 @@
 ## Grammar
 
 import pyparsing as P
+from xdr.ir import *
 
 kw = P.Keyword
 s = P.Suppress
@@ -74,3 +75,52 @@ def parse_ast(src):
     Given an input string, return the AST.
     """
     return specification.parseString(src, parseAll=True).asList()
+
+def parse_declaration(x):
+    if x[0] == 'void':
+        return XDRDeclaration(None, 'basic', 'void', None)
+    elif x[0] == 'opaque' or x[0] == 'string':
+        type = x[0]
+        name = x[1]
+        kind = x[2] == '[' and 'array' or 'list'
+        length = x[3]
+        if length == '>':
+            length = None
+        return XDRDeclaration(name, kind, type, length)
+    else:
+        name = x[1]
+        kind = 'basic'
+        type = ' '.join(x[0])
+        length = None
+        if name == '*':
+            name = x[2]
+            kind = 'optional'
+        elif len(x) > 2 and x[2] == '[':
+            kind = 'array'
+        elif len(x) > 2 and x[2] == '<':
+            kind = 'list'
+        if kind == 'array' or kind == 'list':
+            length = x[3]
+            if length == '>':
+                length = None
+        return XDRDeclaration(name, kind, type, length)
+
+def parse_definition(x):
+    if x[0] == 'struct':
+        return XDRStruct(x[1], [parse_declaration(y) for y in x[2]])
+    elif x[0] == 'enum':
+        return XDREnum(x[1], [XDREnumMember(y[0], y[1]) for y in x[2]])
+    elif x[0] == 'const':
+        return XDRConst(x[1], x[2])
+    elif x[0] == 'typedef':
+        return XDRTypedef(parse_declaration(x[1]))
+    elif x[0] == 'union':
+        return XDRUnion(x[1], parse_declaration(x[2]),
+                        [XDRUnionMember(y[0], parse_declaration(y[1])) for y in x[3]])
+
+def parse(src):
+    """
+    Given an input string, return the IR.
+    """
+    ast = parse_ast(src)
+    return [parse_definition(x) for x in ast]
