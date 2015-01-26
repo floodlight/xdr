@@ -1,3 +1,12 @@
+"""
+Generate Python expressions to pack/unpack a given type
+
+For basic types we directly call methods on the Packer/Unpacker. For
+user-defined types (identifiers in the declaration grammar) we call
+pack_into/unpack_from on a class with the given name. This works
+whether the type is a struct, enum, union, or typedef.
+"""
+
 BASIC_TYPES = {
     'int' : 'int',
     'unsigned int': 'uint',

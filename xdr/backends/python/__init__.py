@@ -1,8 +1,17 @@
 """
 Python backend
 
-TODO
- - Typedefs
+Creates one __init__.py file in the output directory. Classes are generated for
+structs, enums, and unions. Each class has pack and unpack methods to convert
+the Python objects to and from XDR encoded strings.
+
+Usage:
+
+    import myxdr
+    x = myxdr.foo(a=1, b="bar")
+    data = x.pack()
+    y = myxdr.foo.unpack(data)
+    assert x == y
 """
 import os
 from xdr.parser import *
