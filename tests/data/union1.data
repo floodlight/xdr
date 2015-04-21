@@ -18,3 +18,5 @@ struct bar {
 [1, 42]
 -- python
 xdr.root.a(42)
+-- lua
+{ type=1, value=42 }

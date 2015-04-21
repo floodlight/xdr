@@ -9,3 +9,5 @@ struct root {
 xdr.root(a=0xffffffff, b=-1)
 -- python string
 root(a=4294967295, b=-1)
+-- lua
+{ a=0xffffffff, b=-1 }
