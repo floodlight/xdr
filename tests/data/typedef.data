@@ -1,11 +1,16 @@
+-- xdr
 typedef int myint;
 typedef bool mybool;
 typedef string mystring<>;
 typedef opaque myopaque[2];
 
-struct foo {
+struct root {
     myint a;
     mybool b;
     mystring c;
     myopaque d;
 };
+-- raw
+[1, 0, 3, "ABC", "DE"]
+-- python
+xdr.root(a=1, b=False, c="ABC", d="DE")

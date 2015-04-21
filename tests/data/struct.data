@@ -1,0 +1,13 @@
+-- xdr
+struct root {
+    int a;
+    int b;
+};
+-- raw
+[1, 2]
+-- python
+xdr.root(a=1, b=2)
+-- python string
+root(a=1, b=2)
+-- lua
+{ a=1, b=2 }

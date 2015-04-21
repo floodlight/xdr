@@ -1,126 +1,53 @@
-#!/usr/bin/env python
-import unittest
-import xdr
 import tempfile
 import os
 import imp
-import xdrlib
 import subprocess
 import shutil
 import sys
+import test_data
+from nose.tools import assert_equal
+from nose.plugins.skip import Skip, SkipTest
 
 root = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
-def pack(*xs):
+def load_xdr(data):
     """
-    Low-level XDR encoder for tests
-
-    Only supports ints and fixed length strings. You can construct
-    any XDR message from these primitives. It's a cleaner syntax
-    for binary data.
+    Compile and load generated Python code into the running process
     """
-    packer = xdrlib.Packer()
-    for x in xs:
-        if isinstance(x, int):
-            packer.pack_int(x)
-        elif isinstance(x, str):
-            packer.pack_fopaque(len(x), x)
-        else:
-            assert(False)
-    return packer.get_buffer()
+    modulename = 'test_xdr'
+    if modulename in sys.modules:
+        del sys.modules[modulename]
+    tmpdir = tempfile.mkdtemp(prefix="xdr-test-python.")
+    filename = os.path.join(tmpdir, "test.xdr")
+    with open(filename, 'w') as f: f.write(data)
+    outdir = os.path.join(tmpdir, modulename)
+    bindir = os.path.join(root, "bin")
+    subprocess.check_call([bindir+"/xdr", "-t", "python", "-o", outdir, filename])
+    mod = imp.load_source(modulename, outdir + '/__init__.py')
+    shutil.rmtree(tmpdir)
+    return mod
 
-class XDRTestCase(unittest.TestCase):
-    maxDiff = None
+def check_datafile(filename):
+    """
+    Check that the generated Python code can serialize and deserialize correctly
+    """
+    data = test_data.read(filename)
+    if not 'python' in data:
+        raise SkipTest("no python section in datafile")
 
-    def __init__(self, *args, **kwargs):
-        self.tmpdirs = []
-        unittest.TestCase.__init__(self, *args, **kwargs)
+    mod = load_xdr(data['xdr'])
+    x = eval(data['python'], { 'xdr': mod })
+    assert_equal(x.pack(), data['binary'])
+    y = mod.root.unpack(data['binary'])
+    assert_equal(x, y)
+    assert_equal(y.pack(), data['binary'])
 
-    def load_xdr(self, name):
-        """
-        Run bin/xdr on a file from tests/xdr/, then import it
+    if 'python string' in data:
+        assert_equal(str(x), data['python string'])
+        assert_equal(str(y), data['python string'])
 
-        Returns the imported module
-        """
-        modulename = os.path.splitext(name)[0] + '_xdr'
-        if modulename in sys.modules:
-            return sys.modules[modulename]
-        bindir = os.path.join(root, "bin")
-        filename = os.path.join(root, "tests", "xdr", name)
-        tmpdir = tempfile.mkdtemp(prefix="xdr-test-python.")
-        outdir = os.path.join(tmpdir, modulename)
-        self.tmpdirs.append(tmpdir)
-        subprocess.check_call([bindir+"/xdr", "-t", "python", "-o", outdir, filename])
-        return imp.load_source(modulename, outdir + '/__init__.py')
-
-    def tearDown(self):
-        # Delete temporary directories if the test passed
-        if sys.exc_info() == (None, None, None):
-            for tmpdir in self.tmpdirs:
-                shutil.rmtree(tmpdir)
-
-class PackTests(XDRTestCase):
-    def test_struct(self):
-        proto = self.load_xdr("struct.x")
-        x = proto.foo(a=1, b=[2, proto.X, proto.bar.J],
-                      c=[5], d="bar", e="\x00\x01", f=proto.bar.I)
-        expected = pack(1, 2, 3, 200, 1, 5, 3, "bar", 2, "\x00\x01", 100)
-        self.assertEquals(x.pack(), expected)
-        y = proto.foo.unpack(expected)
-        self.assertEquals(x, y)
-        self.assertEquals(y.pack(), expected)
-
-    def test_union(self):
-        proto = self.load_xdr("union.x")
-
-        x = proto.foo.a(42)
-        expected = pack(1, 42)
-        self.assertEquals(x.pack(), expected)
-        y = proto.foo.unpack(expected)
-        self.assertEquals(x, y)
-        self.assertEquals(y.pack(), expected)
-
-        x = proto.foo.b(64)
-        expected = pack(2, 64)
-        self.assertEquals(x.pack(), expected)
-        y = proto.foo.unpack(expected)
-        self.assertEquals(x, y)
-        self.assertEquals(y.pack(), expected)
-
-        x = proto.foo.c("ABC")
-        expected = pack(3, 3, "ABC")
-        self.assertEquals(x.pack(), expected)
-        y = proto.foo.unpack(expected)
-        self.assertEquals(x, y)
-        self.assertEquals(y.pack(), expected)
-
-        x = proto.foo.d(proto.bar(a=1, b=2))
-        expected = pack(4, 1, 2)
-        self.assertEquals(x.pack(), expected)
-        y = proto.foo.unpack(expected)
-        self.assertEquals(x, y)
-        self.assertEquals(y.pack(), expected)
-
-    def test_typedef(self):
-        proto = self.load_xdr("typedef.x")
-
-        x = proto.foo(a=1, b=False, c="ABC", d="DE")
-        expected = pack(1, 0, 3, "ABC", "DE")
-        self.assertEquals(x.pack(), expected)
-        y = proto.foo.unpack(expected)
-        self.assertEquals(x, y)
-        self.assertEquals(y.pack(), expected)
-
-class StringTests(XDRTestCase):
-    def test_enum_string(self):
-        proto = self.load_xdr("struct.x")
-        self.assertEquals(repr(proto.bar.I), "bar.I")
-        self.assertEquals(str(proto.bar.I), "bar.I")
-
-    def test_struct_string(self):
-        proto = self.load_xdr("struct.x")
-        x = proto.foo(a=1, b=[2, proto.X, 4],
-                      c=[5], d="bar", e="\x00\x01", f=proto.bar.I)
-        expected = "foo(a=1, b=[2, 3, 4], c=[5], d='bar', e='\\x00\\x01', f=bar.I)"
-        self.assertEquals(repr(x), expected)
-        self.assertEquals(str(x), expected)
+def test_datafiles():
+    # Nose test generator
+    # Creates a testcase for each datafile
+    for filename in test_data.list_files():
+        yield check_datafile, filename
