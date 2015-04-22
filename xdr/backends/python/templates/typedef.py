@@ -1,4 +1,4 @@
-class ${typedef.declaration.name}(object):
+class ${typedef.declaration.name}(XDRTypedef):
     @classmethod
     def pack_into(self, packer, obj):
 :: include_indented("_pack.py", indent=8, m=typedef.declaration, src="obj")

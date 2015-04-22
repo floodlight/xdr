@@ -80,3 +80,10 @@ class XDRUnionMember(object):
 
     def __ne__(self, other):
         return not self == other
+
+class XDRTypedef(object):
+    __slots__ = []
+
+    @classmethod
+    def unpack(cls, data):
+        return cls.unpack_from(xdrlib.Unpacker(data))
