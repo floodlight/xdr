@@ -1,0 +1,41 @@
+-- xdr
+struct node {
+    int value;
+    node *left;
+    node *right;
+};
+
+struct root {
+    node *head;
+};
+-- raw
+[1,
+   100, # value
+   0, # empty left subtree
+   1, 200,
+     1, 300, 0, 0,
+     1, 400, 0, 0,
+]
+-- python
+xdr.root(
+    head=xdr.node(
+        value=100,
+        left=None,
+        right=xdr.node(
+            value=200,
+            left=xdr.node(value=300),
+            right=xdr.node(value=400))))
+-- python string
+root(head=node(value=100, left=None, right=node(value=200, left=node(value=300, left=None, right=None), right=node(value=400, left=None, right=None))))
+-- lua
+{
+    head={
+        value=100,
+        left=nil,
+        right={
+            value=200,
+            left={ value=300 },
+            right={ value=400 }
+        }
+    }
+}
