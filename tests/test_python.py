@@ -18,14 +18,14 @@ def load_xdr(data):
     if modulename in sys.modules:
         del sys.modules[modulename]
     tmpdir = tempfile.mkdtemp(prefix="xdr-test-python.")
+    print "tmpdir", tmpdir
     filename = os.path.join(tmpdir, "test.xdr")
     with open(filename, 'w') as f: f.write(data)
     outdir = os.path.join(tmpdir, modulename)
     bindir = os.path.join(root, "bin")
     subprocess.check_call([bindir+"/xdr", "-t", "python", "-o", outdir, filename])
     mod = imp.load_source(modulename, outdir + '/__init__.py')
-    shutil.rmtree(tmpdir)
-    return mod
+    return mod, tmpdir
 
 def check_datafile(filename):
     """
@@ -35,7 +35,7 @@ def check_datafile(filename):
     if not 'python' in data:
         raise SkipTest("no python section in datafile")
 
-    mod = load_xdr(data['xdr'])
+    mod, tmpdir = load_xdr(data['xdr'])
     x = eval(data['python'], { 'xdr': mod })
     assert_equal(x.pack(), data['binary'])
     y = mod.root.unpack(data['binary'])
@@ -45,6 +45,8 @@ def check_datafile(filename):
     if 'python string' in data:
         assert_equal(str(x), data['python string'])
         assert_equal(str(y), data['python string'])
+
+    shutil.rmtree(tmpdir)
 
 def test_datafiles():
     # Nose test generator
