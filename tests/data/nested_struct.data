@@ -1,0 +1,16 @@
+-- xdr
+struct foo {
+    int a;
+};
+
+struct root {
+    foo a;
+    foo b;
+};
+
+-- raw
+[1, 2]
+-- python
+xdr.root(a=xdr.foo(a=1), b=xdr.foo(a=2))
+-- lua
+{ a={ a=1 }, b={ a=2 } }
