@@ -46,6 +46,9 @@ class XDRStruct(object):
     def __str__(self):
         return repr(self)
 
+    def __ne__(self, other):
+        return not self == other
+
 class XDRUnion(object):
     @classmethod
     def unpack(cls, data):
