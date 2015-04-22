@@ -1,9 +1,10 @@
+:: from xdr.backends.python.utils import literal
 class ${union.name}(XDRUnion):
     @classmethod
     def unpack_from(cls, unpacker):
         discriminant = unpacker.unpack_int()
 :: for m in union.members:
-        if discriminant == ${m.cases[0]}:
+        if discriminant == ${literal(m.cases[0], constants)}:
             return cls.${m.declaration.name}.unpack_from(unpacker)
 :: #endfor
 :: for m in union.members:
@@ -11,7 +12,7 @@ class ${union.name}(XDRUnion):
     class ${m.declaration.name}(XDRUnionMember):
         @classmethod
         def pack_into(cls, packer, obj):
-            packer.pack_int(${repr(m.cases[0])})
+            packer.pack_int(${literal(m.cases[0], constants)})
 :: include_indented("_pack.py", indent=12, m=m.declaration, src="obj.value")
 
         @classmethod

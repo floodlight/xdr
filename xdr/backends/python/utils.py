@@ -28,3 +28,10 @@ def unpack_expr(m):
         return "unpacker.unpack_%s()" % BASIC_TYPES[m.type]
     else:
         return "%s.unpack_from(unpacker)" % m.type
+
+def literal(x, constants):
+    if type(x) == str:
+        assert x in constants
+        return constants[x]
+    else:
+        return x
