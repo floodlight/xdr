@@ -74,3 +74,6 @@ class XDRUnionMember(object):
 
     def __eq__(self, other):
         return type(self) == type(other) and self.value == other.value
+
+    def __ne__(self, other):
+        return not self == other
