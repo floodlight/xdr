@@ -1,0 +1,11 @@
+-- xdr
+struct root {
+    unsigned int a;
+    int b;
+};
+-- raw
+[0xffffffff, -1]
+-- python
+xdr.root(a=0xffffffff, b=-1)
+-- python string
+root(a=4294967295, b=-1)

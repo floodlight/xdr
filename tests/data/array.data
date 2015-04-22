@@ -1,0 +1,12 @@
+-- xdr
+struct root {
+    int a<>;
+};
+-- raw
+[3, 1, 2, 3]
+-- python
+xdr.root(a=[1, 2, 3])
+-- python string
+root(a=[1, 2, 3])
+-- lua
+{ a={ 1, 2, 3 } }

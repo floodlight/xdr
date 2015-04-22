@@ -1,0 +1,17 @@
+-- xdr
+struct foo {
+    int x;
+    int y;
+};
+
+struct root {
+    foo a<>;
+};
+-- raw
+[2, 1, 2, 3, 4]
+-- python
+xdr.root(a=[xdr.foo(x=1, y=2), xdr.foo(x=3, y=4)])
+-- python string
+root(a=[foo(x=1, y=2), foo(x=3, y=4)])
+-- lua
+{ a={ { x=1, y=2 }, { x=3, y=4 } } }

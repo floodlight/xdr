@@ -1,0 +1,12 @@
+-- xdr
+struct root {
+    string a[3];
+};
+-- raw
+["xy\x00"]
+-- python
+xdr.root(a="xy\x00")
+-- python string
+root(a='xy\x00')
+-- lua
+{ a="xy\0" }
