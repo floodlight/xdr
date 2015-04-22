@@ -51,6 +51,10 @@ class XDRUnion(object):
     def unpack(cls, data):
         return cls.unpack_from(xdrlib.Unpacker(data))
 
+    @classmethod
+    def pack_into(cls, packer, obj):
+        type(obj).pack_into(packer, obj)
+
 class XDRUnionMember(object):
     __slots__ = ["value"]
 
