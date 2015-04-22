@@ -1,0 +1,26 @@
+-- xdr
+const A = 1;
+const B = 2;
+
+union foo switch (int type) {
+    case A:
+        int a;
+    case B:
+        int b;
+};
+
+struct root {
+    foo a;
+    foo b;
+};
+-- raw
+[1, 100, 2, 200]
+-- python
+xdr.root(
+    a=xdr.foo.a(100),
+    b=xdr.foo.b(200))
+-- lua
+{
+    a={ type=xdr.A, value=100 },
+    b={ type=xdr.B, value=200 }
+}
