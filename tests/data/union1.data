@@ -1,4 +1,5 @@
-union foo switch (int type) {
+-- xdr
+union root switch (int type) {
     case 1:
         int a;
     case 2:
@@ -13,3 +14,7 @@ struct bar {
     int a;
     int b;
 };
+-- raw
+[1, 42]
+-- python
+xdr.root.a(42)

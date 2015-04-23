@@ -1,0 +1,13 @@
+-- xdr
+struct root {
+    bool a;
+    bool b;
+};
+-- raw
+[0, 1]
+-- python
+xdr.root(a=False, b=True)
+-- python string
+root(a=False, b=True)
+-- lua
+{ a=false, b=true }

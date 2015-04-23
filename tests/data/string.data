@@ -1,0 +1,12 @@
+-- xdr
+struct root {
+    string a<>;
+};
+-- raw
+[3, "foo"]
+-- python
+xdr.root(a="foo")
+-- python string
+root(a='foo')
+-- lua
+{ a="foo" }

@@ -1,0 +1,25 @@
+-- xdr
+const X = 3;
+
+struct root {
+    int a;
+    int b[X];
+    int c<2>;
+    string d<>;
+    opaque e<X>;
+    bar f;
+};
+
+enum bar {
+    I = 100,
+    J = 200
+};
+-- raw
+[1, 2, 3, 200, 1, 5, 3, "bar", 2, "\x00\x01", 100]
+-- python
+xdr.root(a=1, b=[2, xdr.X, int(xdr.bar.J)],
+         c=[5], d="bar", e="\x00\x01", f=xdr.bar.I)
+-- python string
+root(a=1, b=[2, 3, 200], c=[5], d='bar', e='\x00\x01', f=bar.I)
+-- lua
+{ a=1, b={ 2, xdr.X, 200 }, c={ 5 }, d="bar", e="\000\001", f=xdr.bar.I }
