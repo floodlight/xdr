@@ -1,0 +1,71 @@
+-- xdr
+enum expr_type {
+    LIT=1,
+    NEG=2,
+    ADD=3,
+    MUL=4
+};
+
+union expr switch (expr_type type) {
+    case LIT:
+        int lit;
+    case NEG:
+        expr neg;
+    case ADD:
+        binop add;
+    case MUL:
+        binop mul;
+};
+
+struct binop {
+    expr left;
+    expr right;
+};
+
+typedef expr root;
+-- raw
+[3,
+    4,
+        1, 100,
+        2,
+            1, 200,
+    2,
+        3,
+            1, 300,
+            1, 400]
+-- python
+xdr.expr.add(xdr.binop(
+    xdr.expr.mul(xdr.binop(
+        xdr.expr.lit(100),
+        xdr.expr.neg(
+            xdr.expr.lit(200)))),
+    xdr.expr.neg(
+        xdr.expr.add(xdr.binop(
+            xdr.expr.lit(300),
+            xdr.expr.lit(400))))))
+-- lua
+{
+    type=xdr.expr_type.ADD,
+    value={
+        left={
+            type=xdr.expr_type.MUL,
+            value={
+                left={ type=xdr.expr_type.LIT, value=100 },
+                right={
+                    type=xdr.expr_type.NEG,
+                    value={ type=xdr.expr_type.LIT, value=200 }
+                }
+            }
+        },
+        right={
+            type=xdr.expr_type.NEG,
+            value={
+                type=xdr.expr_type.ADD,
+                value={
+                    left={ value={ type=xdr.expr_type.LIT, value=300 } },
+                    right={ value={ type=xdr.expr_type.LIT, value=400 } }
+                }
+            }
+        }
+    }
+}

@@ -46,10 +46,17 @@ class XDRStruct(object):
     def __str__(self):
         return repr(self)
 
+    def __ne__(self, other):
+        return not self == other
+
 class XDRUnion(object):
     @classmethod
     def unpack(cls, data):
         return cls.unpack_from(xdrlib.Unpacker(data))
+
+    @classmethod
+    def pack_into(cls, packer, obj):
+        type(obj).pack_into(packer, obj)
 
 class XDRUnionMember(object):
     __slots__ = ["value"]
@@ -70,3 +77,13 @@ class XDRUnionMember(object):
 
     def __eq__(self, other):
         return type(self) == type(other) and self.value == other.value
+
+    def __ne__(self, other):
+        return not self == other
+
+class XDRTypedef(object):
+    __slots__ = []
+
+    @classmethod
+    def unpack(cls, data):
+        return cls.unpack_from(xdrlib.Unpacker(data))

@@ -18,3 +18,5 @@ struct bar {
 [2, 64]
 -- python
 xdr.root.b(64)
+-- lua
+{ type=2, value=64 }

@@ -8,7 +8,7 @@ import pyparsing
 def main():
     parser = argparse.ArgumentParser(description='XDR compiler')
     parser.add_argument("input", metavar="FILE", type=file, help="Input file")
-    parser.add_argument("--target", "-t", required=True, choices=["python"], help="Target language")
+    parser.add_argument("--target", "-t", required=True, choices=["python", "lua"], help="Target language")
     parser.add_argument("--output", "-o", metavar="PATH", help="Output directory")
 
     args = parser.parse_args()

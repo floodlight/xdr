@@ -14,3 +14,5 @@ struct root {
 [1, 0, 3, "ABC", "DE"]
 -- python
 xdr.root(a=1, b=False, c="ABC", d="DE")
+-- lua
+{ a=1, b=false, c="ABC", d="DE" }

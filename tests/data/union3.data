@@ -18,3 +18,5 @@ struct bar {
 [3, 3, "ABC"]
 -- python
 xdr.root.c("ABC")
+-- lua
+{ type=3, value="ABC" }
