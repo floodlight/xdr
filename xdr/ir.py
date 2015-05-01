@@ -13,7 +13,7 @@ XDREnumMember = namedtuple("XDREnumMember", ["name", "value"])
 XDRConst = namedtuple("XDRConst", ["name", "value"])
 XDRTypedef = namedtuple("XDRTypedef", ["declaration"])
 XDRUnion = namedtuple("XDRUnion", ["name", "discriminant", "members"])
-XDRUnionMember = namedtuple("XDRUnionMember", ["cases", "declaration"])
+XDRUnionMember = namedtuple("XDRUnionMember", ["case", "declaration"])
 
 __all__ = [
     'XDRStruct', 'XDRDeclaration', 'XDREnum', 'XDREnumMember',

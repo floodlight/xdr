@@ -48,7 +48,7 @@ enum_body = s("{") + g(P.delimitedList(g(identifier + s('=') + constant))) + s("
 
 struct_body = s("{") + P.OneOrMore(g(declaration + s(";"))) + s("}")
 
-case_spec = g(g(P.OneOrMore(s(kw("case")) - value + s(":"))) + g(declaration) + s(";"))
+case_spec = g(s(kw("case")) - value + s(":") + g(declaration) + s(";"))
 default_spec = g(kw('default') - s(':') + g(declaration) + s(';'))
 
 union_body = \

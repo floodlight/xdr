@@ -122,7 +122,6 @@ class UnionTests(unittest.TestCase):
 union foo switch(int type) {
     case 1: int a;
     case 2:
-    case 3:
         float b;
     default:
         opaque c<>;
@@ -134,8 +133,8 @@ union foo switch(int type) {
                 'foo',
                 [['int'], 'type'],
                 [
-                    [[1], [['int'], 'a']],
-                    [[2, 3], [['float'], 'b']],
+                    [1, [['int'], 'a']],
+                    [2, [['float'], 'b']],
                     ['default', ['opaque', 'c', '<', '>']],
                 ]]])
 
@@ -144,9 +143,9 @@ union foo switch(int type) {
             XDRUnion(name='foo',
                 discriminant=XDRDeclaration(name='type', kind='basic', type='int', length=None),
                 members=[
-                    XDRUnionMember(cases=[1], declaration=XDRDeclaration(name='a', kind='basic', type='int', length=None)),
-                    XDRUnionMember(cases=[2, 3], declaration=XDRDeclaration(name='b', kind='basic', type='float', length=None)),
-                    XDRUnionMember(cases='default', declaration=XDRDeclaration(name='c', kind='list', type='opaque', length=None)),
+                    XDRUnionMember(case=1, declaration=XDRDeclaration(name='a', kind='basic', type='int', length=None)),
+                    XDRUnionMember(case=2, declaration=XDRDeclaration(name='b', kind='basic', type='float', length=None)),
+                    XDRUnionMember(case='default', declaration=XDRDeclaration(name='c', kind='list', type='opaque', length=None)),
                 ])])
 
 class ConstantTests(unittest.TestCase):
